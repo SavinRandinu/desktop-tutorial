@@ -1,9 +1,10 @@
 import Link from 'next/link';
 import React from 'react';
 import LoginOutButton from './LoginOutButton';
+import { getSessionCookie } from '../_lib/session';
 
-const Navbar = () => {
-    const session = false;
+const Navbar = async () => {
+    const session = await getSessionCookie();
     return (
         <nav className="bg-white shadow-sm">
             <div className="container mx-auto px-4 py-4 flex items-center justify-between">
