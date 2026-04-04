@@ -3,7 +3,7 @@ import React from 'react';
 import LoginOutButton from './LoginOutButton';
 
 const Navbar = () => {
-    const session = true;
+    const session = false;
     return (
         <nav className="bg-white shadow-sm">
             <div className="container mx-auto px-4 py-4 flex items-center justify-between">
