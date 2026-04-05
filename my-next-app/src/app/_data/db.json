@@ -1,16 +1,22 @@
 {
   "contacts": [
     {
-      "id": "1",
-      "name": "John",
+      "name": "John Doe",
       "email": "John@gmail.com",
-      "userId": "1"
+      "userId": "1",
+      "id": "1"
     },
     {
-      "name": "Savin",
+      "name": "Savin Madapatha",
       "email": "savin@gmail.com",
       "userId": "1",
       "id": "aI-qzjl"
+    },
+    {
+      "name": "Afra",
+      "email": "afra@gmail.com",
+      "userId": "2",
+      "id": "43WNYIx"
     }
   ],
   "users": [
@@ -19,6 +25,12 @@
       "name": "user1",
       "email": "user1@gmail.com",
       "password": "password1"
+    },
+    {
+      "id": "2",
+      "name": "user2",
+      "email": "user2@gmail.com",
+      "password": "password2"
     }
   ]
 }
