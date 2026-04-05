@@ -1,6 +1,3 @@
-# Welcome to GitHub Desktop!
+# A simple web app developed using Next.js
 
-This is your README. READMEs are where you can communicate what your project is and how to use it.
-
-Write your name on line 6, save it, and then head back to GitHub Desktop.
-Savin Maddapatha
+## This web site purpose is to enable a use to create/update/delete contacts.
