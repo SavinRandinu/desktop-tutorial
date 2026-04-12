@@ -1,29 +1,57 @@
-import axios from "axios";
 import { ContactType } from "../_types/contact";
-
-const API_URL = "http://localhost:3001";
+import { supabase } from "@/supabase-client";
 
 export const getContacts = async(userId: string) => {
-  const response = await axios.get(`${API_URL}/contacts?userId=${userId}`);
-  return response.data;
+  const { data, error } = await supabase.from("contacts").select("*").eq("userId", userId);
+  
+  if (error) {
+    console.error("Supabase fetch error:", error);
+    throw new Error(error.message);
+  }
+  
+  return data;
 };
 
 export const getContactById = async(id: string) => {
-    const response = await axios.get(`${API_URL}/contacts/${id}`);
-    return response.data;
+    const { data, error } = await supabase.from("contacts").select("*").eq("id", id).single();
+    
+    if (error) {
+      console.error("Supabase fetch error:", error);
+      throw new Error(error.message);
+    }
+    
+    return data;
 }
 
 export const createContact = async (contact: ContactType) => {
-    const response = await axios.post(`${API_URL}/contacts`, contact);
-    return response.data;
+    const { data, error } = await supabase.from("contacts").insert([contact]).select();
+    
+    if (error) {
+        console.error("Supabase insert error:", error);
+        throw new Error(error.message);
+    }
+    
+    return data;
 }
 
 export const updateContact = async (id: string, contact: ContactType) => {
-    const response = await axios.put(`${API_URL}/contacts/${id}`, contact);
-    return response.data;
+    const { data, error } = await supabase.from("contacts").update(contact).eq("id", id).select();
+    
+    if (error) {
+      console.error("Supabase update error:", error);
+      throw new Error(error.message);
+    }
+    
+    return data;
 }
 
 export const deleteContact = async (id: string) => {
-    const response = await axios.delete(`${API_URL}/contacts/${id}`);
-    return response.data;
+    const { data, error } = await supabase.from("contacts").delete().eq("id", id).select();
+    
+    if (error) {
+      console.error("Supabase delete error:", error);
+      throw new Error(error.message);
+    }
+    
+    return data;
 }
