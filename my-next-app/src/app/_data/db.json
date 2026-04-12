@@ -17,6 +17,12 @@
       "email": "afra@gmail.com",
       "userId": "2",
       "id": "43WNYIx"
+    },
+    {
+      "name": "test user",
+      "email": "testuser@gmail.com",
+      "userId": "1",
+      "id": "pUCG1t6"
     }
   ],
   "users": [
