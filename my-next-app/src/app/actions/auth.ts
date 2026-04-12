@@ -1,18 +1,17 @@
 "use server"
 
-import axios from "axios"
 import { redirect } from "next/navigation";
 import { UserType } from "../_types/user";
 import { deleteSessionCookie, setSessionCookie } from "../_lib/session";
-
-const API_URL = "http://localhost:3001";
+import { supabase } from "@/supabase-client";
 
 export const loginAction = async(formData: FormData) => {
     // console.log("formData", formData);
     try {
-        const response = await axios.get(`${API_URL}/users?email=${formData.get("email")}&password=${formData.get("password")}` 
+    const response = await supabase.from("users").select("*").eq("email", formData.get("email")).eq("password", formData.get("password") 
     );
     // console.log("API response:", response.data[0]);
+    if (!response.data) throw new Error("Invalid credentials");
     const user: UserType = response.data[0];
     // console.log("User found:", user);
     if (!user) throw new Error("Invalid credentials");
@@ -29,4 +28,26 @@ export const loginAction = async(formData: FormData) => {
 export const logoutAction = async() => {
     await deleteSessionCookie();
     redirect("/login");
+};
+
+export const registerAction = async(formData: FormData) => {
+    try {
+        const {data, error} = await supabase.from("users").insert({
+            name: formData.get("name") as string,
+            email: formData.get("email") as string,
+            password: formData.get("password") as string
+        }).select();
+
+        if (error) {
+            console.error("Registration error:", error);
+            throw new Error(error.message);
+        }
+
+        const user: UserType = data[0];
+        await setSessionCookie({name: user.name, email: user.email, id: user.id});
+    } catch (error) {
+        console.error("Registration error:", error);
+        throw new Error("Registration failed");
+    }
+    redirect("/contact");
 };
