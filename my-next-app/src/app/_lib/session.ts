@@ -5,6 +5,8 @@ import { supabase } from "@/supabase-client";
 export const getSessionCookie = async(): Promise<UserType | null> => {
     const { data } = await supabase.auth.getSession();
     if (!data.session) return null;
+
+    console.log("Supabase session data:", data);
     
     // Fetch user profile from database using authenticated user ID
     const { data: userData, error } = await supabase
