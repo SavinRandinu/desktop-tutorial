@@ -1,25 +1,21 @@
 "use server"
 
 import { redirect } from "next/navigation";
-import { UserType } from "../_types/user";
-import { deleteSessionCookie, setSessionCookie } from "../_lib/session";
+import { deleteSessionCookie } from "../_lib/session";
 import { supabase } from "@/supabase-client";
 
 export const loginAction = async(formData: FormData) => {
-    // console.log("formData", formData);
     try {
-    const response = await supabase.from("users").select("*").eq("email", formData.get("email")).eq("password", formData.get("password") 
-    );
-    // console.log("API response:", response.data[0]);
-    if (!response.data) throw new Error("Invalid credentials");
-    const user: UserType = response.data[0];
-    // console.log("User found:", user);
-    if (!user) throw new Error("Invalid credentials");
-    // set user in the cookie
-    await setSessionCookie({name: user.name, email: user.email, id: user.id});
+        const { data, error } = await supabase.auth.signInWithPassword({
+            email: formData.get("email") as string,
+            password: formData.get("password") as string
+        });
+
+        if (error || !data.user) throw new Error(error?.message || "Invalid credentials");
     } catch (error) {
-        console.error("Login error:", error);
-        throw new Error("Login failed");
+        const errorMessage = error instanceof Error ? error.message : String(error);
+        console.error("Login error:", errorMessage);
+        throw new Error(`Login failed: ${errorMessage}`);
     }
     // Redirect after successful login
     redirect("/contact");
@@ -32,22 +28,35 @@ export const logoutAction = async() => {
 
 export const registerAction = async(formData: FormData) => {
     try {
-        const {data, error} = await supabase.from("users").insert({
-            name: formData.get("name") as string,
-            email: formData.get("email") as string,
-            password: formData.get("password") as string
-        }).select();
+        const email = formData.get("email") as string;
+        const password = formData.get("password") as string;
+        const name = formData.get("name") as string;
+        
+        console.log("Register attempt - Email:", email, "Name:", name);
+        
+        const { data, error } = await supabase.auth.signUp({
+            email,
+            password
+        });
 
-        if (error) {
-            console.error("Registration error:", error);
-            throw new Error(error.message);
-        }
+        if (error || !data.user) throw new Error(error?.message || "Registration failed");
 
-        const user: UserType = data[0];
-        await setSessionCookie({name: user.name, email: user.email, id: user.id});
+        // Create user profile in users table
+        const { data: userData, error: profileError } = await supabase
+            .from("users")
+            .insert({
+                id: data.user.id,
+                name,
+                email
+            })
+            .select()
+            .single();
+
+        if (profileError) throw new Error(profileError.message);
     } catch (error) {
-        console.error("Registration error:", error);
-        throw new Error("Registration failed");
+        const errorMessage = error instanceof Error ? error.message : String(error);
+        console.error("Registration error:", errorMessage);
+        throw new Error(`Registration failed: ${errorMessage}`);
     }
     redirect("/contact");
 };

@@ -1,25 +1,28 @@
-import { cookies } from "next/headers";
 import { UserType } from "../_types/user";
+import { supabase } from "@/supabase-client";
 
-// Set session cookie
-export const setSessionCookie = async(user: UserType) => {
-    (await cookies()).set("session", JSON.stringify(user), {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        maxAge: 60 * 60 * 24 * 7,
-        path: "/"
-    });
-};
-
-// Get session cookie
+// Get session cookie - Check Supabase auth and fetch user profile from DB
 export const getSessionCookie = async(): Promise<UserType | null> => {
-    const sessionCookie = (await cookies()).get("session")?.value;
-    if (!sessionCookie) return null;
-    return JSON.parse(sessionCookie) as UserType;
+    const { data } = await supabase.auth.getSession();
+    if (!data.session) return null;
+    
+    // Fetch user profile from database using authenticated user ID
+    const { data: userData, error } = await supabase
+        .from("users")
+        .select("*")
+        .eq("id", data.session.user.id)
+        .single();
+    
+    if (error) {
+        console.error("Error fetching user profile:", error);
+        return null;
+    }
+    
+    console.log("Session user:", userData);
+    return userData;
 };
 
-// Delete session cookie
+// Delete session - Sign out from Supabase
 export const deleteSessionCookie = async() => {
-    const cookieStore = await cookies();
-    cookieStore.delete("session");
+    await supabase.auth.signOut();
 };

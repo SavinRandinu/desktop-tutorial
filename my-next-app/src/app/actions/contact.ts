@@ -4,7 +4,6 @@ import { revalidatePath } from "next/cache";
 import { createContact, deleteContact, updateContact } from "../api/contact";
 import { getSessionCookie } from "../_lib/session";
 import { ContactType } from "../_types/contact";
-import { create } from "domain";
 
 export const createContactAction = async(prevState:any, formData: FormData) => {
     if(!formData || !formData.get("name") || !formData.get("email")) {
